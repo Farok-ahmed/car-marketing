@@ -11,17 +11,41 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { getCars } from "@/lib/cars";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
 const Cars = () => {
   const cars = getCars();
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(""); // Debounced value
+
+  const carTypes = [...new Set(cars.map((car) => car.type))];
+
+  // Handle checkbox selection changes for car types
+  const handleChange = (type) => {
+    setSelectedCategories((prev) =>
+      prev.includes(type) ? prev.filter((c) => c !== type) : [...prev, type]
+    );
+  };
+
+  // Filter cars based on selected categories and search query
+  const filteredItem = cars.filter((car) => {
+    const matchesCategory =
+      selectedCategories.length === 0 || selectedCategories.includes(car.type);
+    const matchesSearch = car.name
+      .toLowerCase()
+      .includes(debouncedSearchQuery.toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  });
+
   const perPage = 6;
   const lasIndex = currentPage * perPage;
   const firstIndex = lasIndex - perPage;
-  const datas = cars.slice(firstIndex, lasIndex);
-  const page = Math.ceil(cars.length / perPage);
+  const datas = filteredItem.slice(firstIndex, lasIndex);
+  const page = Math.ceil(filteredItem.length / perPage);
   const numbers = [...Array(page + 1).keys()].slice(1);
 
   const prevPage = () => {
@@ -37,7 +61,16 @@ const Cars = () => {
   const handleChangeCurrentPage = (id) => {
     setCurrentPage(id);
   };
+  // Debounce the search query input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery); // Update debounced search query
+    }, 500); // Debounce delay of 500ms
 
+    return () => {
+      clearTimeout(timer); // Clean up the timer on component unmount or before the next effect
+    };
+  }, [searchQuery]); // Effect runs when searchQuery changes
   return (
     <>
       <div
@@ -48,9 +81,15 @@ const Cars = () => {
         <CarsBreadCrumb />
       </div>
       <div className="container mx-auto">
-        <div className="md:flex flex-row gap-6 md:gap-6 lg:gap-24 py-16 space-y-7 md:space-y-0">
+        <div className="md:flex flex-row gap-6 md:gap-6 h-auto lg:gap-24 py-16 space-y-7 md:space-y-0">
           <div className="w-full md:w-1/3">
-            <CarsSideBar cars={cars} />
+            <CarsSideBar
+              searchQuery={searchQuery}
+              selectedCategories={selectedCategories}
+              setSearchQuery={setSearchQuery}
+              handleChange={handleChange}
+              carTypes={carTypes} // Pass car types to the sidebar
+            />
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 w-full md:w-2/3 gap-5">
             {datas.map((car) => (

@@ -1,20 +1,39 @@
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "./ui/input";
 
-const CarsSideBar = ({ cars }) => {
+const CarsSideBar = ({
+  searchQuery,
+  setSearchQuery,
+  selectedCategories,
+  handleChange,
+  carTypes, // Here you could pass only car types to simplify the data passed to the component
+}) => {
   return (
-    <div className="  bg-[#FFF8F6] shadow-lg rounded-2xl p-8 ">
+    <div className="bg-[#FFF8F6] shadow-lg rounded-2xl p-8">
       <div className="flex flex-col gap-1">
-        <Input type="text" className="my-2" placeholder="Search...." />
+        {/* Search Input */}
+        <Input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="my-2"
+          placeholder="Search...."
+        />
+
+        {/* Car Types */}
         <h1 className="text-2xl font-bold py-3">Car Types</h1>
-        {cars.map((car) => (
-          <div key={car.id} className="flex items-center space-x-2">
-            <Checkbox id={car.id} />
+        {carTypes.map((type) => (
+          <div key={type} className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={selectedCategories.includes(type)}
+              onChange={() => handleChange(type)}
+              id={type} // The checkbox id will now be the type, which is unique
+            />
             <label
-              htmlFor={car.id}
-              className="text-xl py-2 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              htmlFor={type} // Associate the label with the checkbox via type
+              className="text-xl py-2 font-medium"
             >
-              {car.type}
+              {type}
             </label>
           </div>
         ))}
