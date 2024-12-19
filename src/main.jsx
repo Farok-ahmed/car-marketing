@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import App from "./App.jsx";
 import { Toaster } from "./components/ui/toaster.jsx";
+
 import CarContextProvider from "./context/CarContext.jsx";
 import "./index.css";
 
