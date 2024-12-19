@@ -5,7 +5,7 @@ import { BrowserRouter } from "react-router";
 import App from "./App.jsx";
 import { Toaster } from "./components/ui/toaster.jsx";
 
-import CarContextProvider from "./context/CarContext.jsx";
+import CarContextProvider from "./context/CarContextProvider.jsx";
 import "./index.css";
 
 // Import your Publishable Key
